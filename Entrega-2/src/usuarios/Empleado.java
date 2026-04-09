@@ -1,4 +1,4 @@
-package clasesparte1;
+package usuarios;
 
 public abstract class Empleado extends Usuario {
 	public Empleado(String login, String password) {

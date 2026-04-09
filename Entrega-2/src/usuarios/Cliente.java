@@ -1,6 +1,8 @@
-package clasesparte1;
+package usuarios;
 import java.util.ArrayList;
 import java.util.List;
+
+import juego.JuegoDeMesa;
 
 public class Cliente extends Usuario {
 	private int puntosFidelidad;

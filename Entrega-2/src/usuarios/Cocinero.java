@@ -1,4 +1,4 @@
-package clasesparte1;
+package usuarios;
 
 public class Cocinero extends Empleado {
 	public Cocinero(String login, String password) {
