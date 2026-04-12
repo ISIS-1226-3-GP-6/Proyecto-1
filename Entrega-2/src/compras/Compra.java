@@ -1,8 +1,9 @@
 package compras;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class Compra {
+public abstract class Compra implements Serializable{
     
     protected double descuento;
     protected double total;
@@ -28,10 +29,6 @@ public abstract class Compra {
     
     public double getTotal() {
         return total;
-    }
-    
-    public void setTotal(double total) {
-        this.total = total;
     }
     
     public LocalDateTime getFechaHora() {

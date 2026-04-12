@@ -5,6 +5,9 @@ import java.util.List;
 import juego.JuegoDeMesa;
 
 public class Cliente extends Usuario {
+
+	private static final long serialVersionUID = 1L;
+
 	private int puntosFidelidad;
 	private List<JuegoDeMesa> juegosFavoritos;
 	

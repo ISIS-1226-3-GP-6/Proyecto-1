@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import juego.JuegoFisico;
+
 public class CompraJuegoMesa extends Compra {
     
     private List<JuegoFisico> juegos;
@@ -35,7 +37,7 @@ public class CompraJuegoMesa extends Compra {
     public double calcularTotal() {
         double subtotal = 0;
         for (JuegoFisico j : juegos) {
-            subtotal += j.getPrecio(); // creo que no hay atributo de esto jaja
+            subtotal += j.getJuegoBase().getPrecio(); // creo que no hay atributo de esto jaja
         }
         double descuentoAplicado = subtotal * (descuento / 100);
         return subtotal - descuentoAplicado;

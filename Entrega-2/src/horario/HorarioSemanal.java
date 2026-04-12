@@ -1,9 +1,12 @@
 package horario;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HorarioSemanal {
+public class HorarioSemanal implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     
     private Map<String, Turno> turnosPorDia;
     

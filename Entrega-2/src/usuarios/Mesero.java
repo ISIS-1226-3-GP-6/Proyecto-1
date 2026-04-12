@@ -3,7 +3,11 @@ package usuarios;
 import java.util.ArrayList;
 import java.util.List;
 
+import juego.JuegoDeMesa;
+
 public class Mesero extends Empleado {
+
+    private static final long serialVersionUID = 1L;
     
     private List<String> dificilesConocidos;
     
@@ -32,7 +36,7 @@ public class Mesero extends Empleado {
     }
     
     public boolean puedeExplicar(JuegoDeMesa juego) {
-        return juego != null && juego.isEsDifícil() && dificilesConocidos.contains(juego.getNombre());
+        return juego != null && juego.getDificultad() && dificilesConocidos.contains(juego.getNombre());
     }
 
 }

@@ -1,24 +1,31 @@
 package reservacion;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import juego.Prestamo;
+import usuarios.Cliente;
 
-public class Reserva {
+public class Reserva implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private int numPersonas;
     private boolean hayMenores;
     private boolean hayNinos;
     private boolean terminada;
     private int mesaId;
     private Set<Prestamo> prestamosActivos;
+    private Cliente cliente;
     
-    public Reserva(int numPersonas, boolean hayMenores, boolean hayNinos, int mesaId) {
+    public Reserva(int numPersonas, boolean hayMenores, boolean hayNinos, int mesaId, Cliente cliente) {
         this.numPersonas = numPersonas;
         this.hayMenores = hayMenores;
         this.hayNinos = hayNinos;
         this.mesaId = mesaId;
         this.terminada = false;
         this.prestamosActivos = new HashSet<>();
+        this.cliente = cliente;
     }
     
     public int getNumPersonas(){
@@ -54,17 +61,18 @@ public class Reserva {
     public Set<Prestamo> getPrestamosActivos(){
         return prestamosActivos;
     }
-    public void setPrestamosActivos(Set<Prestamo> prestamosActivos){
-        this.prestamosActivos = prestamosActivos;
-    }
-    public void agregarPrestamo(Prestamo p) {
+    public boolean agregarPrestamo(Prestamo p) {
     	if (p == null) {
-            return;
+            return false;
         }
         if (this.terminada) {
-            return;
+            return false;
         }
+        if (prestamosActivos.size() >= 2)
+        	return false;
+        
         this.prestamosActivos.add(p);
+        return true;
     }
     public void cerrarReserva() {
     	this.terminada = true;
@@ -73,6 +81,10 @@ public class Reserva {
                 p.finalizar();
             }
         }
+    }
+    
+    public Cliente getCliente() {
+    	return cliente;
     }
 	
 }
