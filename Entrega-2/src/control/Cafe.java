@@ -627,7 +627,7 @@ public class Cafe implements Serializable {
 
 		List<Platillo> pedidoAna = new ArrayList<>();
 		pedidoAna.addAll(c.menu);
-		CompraPlatillo compraPlatillos = c.generarCompraPlatillos("ana", "1234", pedidoAna, 10);
+		CompraPlatillo compraPlatillos = c.generarCompraPlatillos("ana", "1234", reservaAna, pedidoAna, 10);
 
 		List<JuegoFisico> juegosCompra = new ArrayList<>();
 		juegosCompra.add(c.getCatalogoCompra().get(0));
@@ -647,8 +647,12 @@ public class Cafe implements Serializable {
 		System.out.println("Cafe guardado: " + saved);
 
 		Cafe cafeCargado = new Cafe("test.txt");
+		Reserva reservaAnaCargado = cafeCargado.reservas.stream()
+				.filter(reserva -> reserva.getCliente().getLogin().equals("ana"))
+				.findFirst()
+				.orElse(null);
 		CompraPlatillo compraPlatillosCargada = cafeCargado.generarCompraPlatillos("ana", "1234",
-				new ArrayList<>(cafeCargado.menu), 0);
+				reservaAnaCargado, new ArrayList<>(cafeCargado.menu), 0);
 		imprimirEstado("ESTADO DESPUES DE CARGAR", cafeCargado, compraPlatillosCargada, null, null, null);
 	}
 }
