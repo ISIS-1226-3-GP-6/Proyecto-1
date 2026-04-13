@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import cafeteria.Platillo;
+
 public class CompraPlatillo extends Compra {
     
     private List<Platillo> platillos;
@@ -21,14 +23,8 @@ public class CompraPlatillo extends Compra {
         return platillos;
     }
     
-    public void setPlatillos(List<Platillo> platillos) {
-        this.platillos = platillos;
-    }
-    
     public void agregarPlatillo(Platillo platillo) {
-        if (platillo != null) {
-            this.platillos.add(platillo);
-        }
+    	this.platillos.add(platillo);
     }
     
     @Override 
@@ -38,7 +34,9 @@ public class CompraPlatillo extends Compra {
             subtotal += p.getPrecio();
         }
         double descuentoAplicado = subtotal * (descuento / 100);
-        return subtotal - descuentoAplicado;
+        this.total = subtotal - descuentoAplicado;
+        
+        return this.total;
     }
     
 }

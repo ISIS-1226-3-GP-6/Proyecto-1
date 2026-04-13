@@ -1,6 +1,10 @@
 package juego;
 
-public class JuegoDeMesa {
+import java.io.Serializable;
+
+public class JuegoDeMesa implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	
 	private String nombre;
 	private int anioPublicacion;
@@ -12,7 +16,9 @@ public class JuegoDeMesa {
 	private int maxJugadores;
 	private String tipoJuego;
 	
-	public JuegoDeMesa(String nombre, int anioPublicacion, String empresaMatriz, String tipoJuego, boolean esDificil, boolean puedenNinos, boolean puedenJovenes, int inJugadores, int maxJugadores) {
+	private double precio;
+	
+	public JuegoDeMesa(String nombre, int anioPublicacion, String empresaMatriz, String tipoJuego, boolean esDificil, boolean puedenNinos, boolean puedenJovenes, int inJugadores, int maxJugadores, double precio) {
 		this.nombre = nombre;
 		this.anioPublicacion = anioPublicacion;
 		this.empresaMatriz = empresaMatriz;
@@ -20,6 +26,7 @@ public class JuegoDeMesa {
 		this.esDificil = esDificil;
 		this.puedenNinos = puedenNinos;
 		this.puedenJovenes = puedenJovenes;
+		this.precio = precio;
 	}
 
 	public String getNombre(){
@@ -93,5 +100,13 @@ public class JuegoDeMesa {
 	        return false;
 	    }
 	    return true;
+	}
+
+	public double getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(double precio) {
+		this.precio = precio;
 	}
 }

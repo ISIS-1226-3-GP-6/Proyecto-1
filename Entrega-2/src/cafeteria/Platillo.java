@@ -1,6 +1,11 @@
 package cafeteria;
 
-public abstract class Platillo {
+import java.io.Serializable;
+
+public abstract class Platillo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private double precio;
 	private boolean aprobado;
 	

@@ -1,6 +1,8 @@
 package cafeteria;
 
-public class TicketNuevoPlatillo {
+import java.io.Serializable;
+
+public class TicketNuevoPlatillo implements Serializable {
     
     private boolean aprobado;
     private Platillo platillo;

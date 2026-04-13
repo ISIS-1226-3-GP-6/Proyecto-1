@@ -1,6 +1,11 @@
 package juego;
 
-public class JuegoFisico {
+import java.io.Serializable;
+
+public class JuegoFisico implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private String estado;
 	private boolean ocupado;
 	private JuegoDeMesa juegoBase;
@@ -27,9 +32,6 @@ public class JuegoFisico {
         return juegoBase;
     }
 
-    public void setJuegoBase(JuegoDeMesa juegoBase) {
-        this.juegoBase = juegoBase;
-    }
     public void prestar() {
     	if (this.ocupado) {
             System.out.println("El juego ya está prestado");

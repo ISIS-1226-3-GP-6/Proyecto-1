@@ -1,8 +1,10 @@
 package horario;
 
 import usuarios.Empleado;
+import java.io.Serializable;
 
-public class TicketCambiarTurno {
+public class TicketCambiarTurno implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Empleado empleadoPrincipal;
 	private Turno turnoInicial;
 	private Turno turnoFinal;

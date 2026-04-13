@@ -1,15 +1,27 @@
 package juego;
+import java.io.Serializable;
 import java.util.Date;
 
-public class Prestamo {
+import reservacion.Reserva;
+import usuarios.Cliente;
+import usuarios.Usuario;
+
+public class Prestamo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private Date fecha;
 	private boolean terminado;
 	private JuegoFisico juego;
+	private Usuario usuario;
+	private Reserva reserva;
 	
-	public Prestamo(Date fecha, JuegoFisico juego) {
+	public Prestamo(Date fecha, JuegoFisico juego, Usuario usuario, Reserva reserva) {
         this.fecha = fecha;
         this.juego = juego;
         this.terminado = false;
+        if (usuario == null || (usuario instanceof Cliente && reserva == null))
+        	throw new RuntimeException("Creacion de prestamo invalido");
     }
 
     public Date getFecha(){
@@ -36,5 +48,13 @@ public class Prestamo {
             this.juego.devolver();
         }
     }
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public Reserva getReserva() {
+		return reserva;
+	}
 
 }

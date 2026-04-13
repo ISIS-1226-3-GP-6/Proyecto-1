@@ -1,6 +1,11 @@
 package cafeteria;
 
+import reservacion.Reserva;
+
 public class Bebida extends Platillo {
+
+	private static final long serialVersionUID = 1L;
+
 	private boolean esAlcoholica;
 	private boolean esCaliente;
 	
@@ -22,8 +27,8 @@ public class Bebida extends Platillo {
 	public void setCaliente(boolean nuevo) {
 		this.esCaliente=nuevo;
 	}
-	public boolean esPermitida(boolean menores) {
-        if (menores && this.esAlcoholica) {
+	public boolean esPermitidaEn(Reserva reserva) {
+        if (reserva.isHayMenores() && this.esAlcoholica) {
             return false;
         }
         return true;

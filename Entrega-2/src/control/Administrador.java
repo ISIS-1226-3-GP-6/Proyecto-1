@@ -1,9 +1,44 @@
-package usuarios;
+package control;
 
-public class Administrador extends Usuario {
+import java.io.Serializable;
+
+import cafeteria.TicketNuevoPlatillo;
+import horario.TicketCambiarTurno;
+import juego.JuegoFisico;
+
+public class Administrador implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private String login;
+	private String password;
+	
+	public String getLogin() {
+		return login;
+	}
+	public void setLogin(String nuevo) {
+		this.login=nuevo;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String nuevo) {
+		this.password=nuevo;
+	}
+	public boolean autenticacion(String password) {
+	    if (password == null) {
+	        return false;
+	    }
+	    if (this.password.equals(password)) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
     
     public Administrador(String login, String password) {
-        super(login, password);
+    	this.login=login;
+		this.password=password;
     }
     
     public void aprobarTicketTurno(TicketCambiarTurno ticket) {
@@ -35,6 +70,7 @@ public class Administrador extends Usuario {
             if (destino.equalsIgnoreCase("COMPRA")) {
                 cafe.agregarJuegoCompra(juego);
             } else if (destino.equalsIgnoreCase("PRESTAMO")) {
+            	
                 cafe.agregarJuegoPrestamo(juego);
             }
         }
