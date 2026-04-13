@@ -557,7 +557,8 @@ public class Cafe implements Serializable {
 		System.out.println("====================================");
 	}
 	
-
+	/*
+		Con esto se hizo el test.txt
 	public static void main(String[] args) {
 		Cafe c = new Cafe("test.txt", 50, "password", "admin");
 
@@ -654,5 +655,10 @@ public class Cafe implements Serializable {
 		CompraPlatillo compraPlatillosCargada = cafeCargado.generarCompraPlatillos("ana", "1234",
 				reservaAnaCargado, new ArrayList<>(cafeCargado.menu), 0);
 		imprimirEstado("ESTADO DESPUES DE CARGAR", cafeCargado, compraPlatillosCargada, null, null, null);
+	}
+	*/
+	public static void main(String[] args) {
+		Cafe cafeCargado = new Cafe("escenario1.txt");
+		Cafe.imprimirEstado("CAFE CARGADO DESDE escenario1.txt", cafeCargado, null, null, null, null);
 	}
 }
