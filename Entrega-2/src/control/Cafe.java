@@ -365,11 +365,25 @@ public class Cafe implements Serializable {
 		return compra;
 	}
 
-	public CompraPlatillo generarCompraPlatillos(String login, String password, List<Platillo> platillos, double descuento) {
+	public CompraPlatillo generarCompraPlatillos(String login, String password, Reserva reserva, List<Platillo> platillos, double descuento) {
 		Usuario usuario = autenticarUsuario(login, password);
-		if (usuario == null || platillos == null || platillos.isEmpty() || descuento < 0) {
+		if (usuario == null || platillos == null || platillos.isEmpty() || descuento < 0 || !(usuario instanceof Cliente) || reserva == null || !reservas.contains(reserva)) {
 			return null;
 		}
+
+		if (!reserva.getCliente().getLogin().equals(login)) {
+			return null;
+		}
+
+		if (platillos.stream().anyMatch(platillo -> {
+			if (platillo instanceof Bebida) {
+				return !((Bebida) platillo).esPermitidaEn(reserva);
+			}
+			return false;
+		})) {
+			return null;
+		}
+
 
 		CompraPlatillo compra = new CompraPlatillo();
 		compra.setDescuento(descuento);
