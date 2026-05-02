@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Scanner;
+
 
 import cafeteria.Bebida;
 import cafeteria.Comida;
@@ -106,7 +108,7 @@ public class Cafe implements Serializable {
 	}
 	
 	
-	private boolean save() {
+	public boolean save() {
 		
 		boolean successful = false;
 		
@@ -557,8 +559,9 @@ public class Cafe implements Serializable {
 		System.out.println("====================================");
 	}
 	
-	/*
-		Con esto se hizo el test.txt
+	
+	/*	Con esto se hizo el test.txt
+
 	public static void main(String[] args) {
 		Cafe c = new Cafe("test.txt", 50, "password", "admin");
 
@@ -658,7 +661,58 @@ public class Cafe implements Serializable {
 	}
 	*/
 	public static void main(String[] args) {
-		Cafe cafeCargado = new Cafe("escenario1.txt");
-		Cafe.imprimirEstado("CAFE CARGADO DESDE escenario1.txt", cafeCargado, null, null, null, null);
-	}
+		/*Cafe c = new Cafe("escenario1.txt", 50, "password", "admin");
+		c.save();*/
+		String nombreCafe = "escenario1.txt";
+		Cafe cafeCargado = new Cafe(nombreCafe);
+		/*Cafe.imprimirEstado("CAFE CARGADO DESDE escenario1.txt", cafeCargado, null, null, null, null);*/
+		
+		
+		Scanner scanner = new Scanner(System.in);
+        int opcion;
+        
+        do {
+        	System.out.println("\n Bienvenido al cafe "+nombreCafe+"");
+            System.out.println("1. Cliente");
+            System.out.println("2. Empleado");
+            System.out.println("3. Administrador");
+            System.out.print("Seleccione una opción: ");
+            
+            if (scanner.hasNextInt()) {
+                opcion = scanner.nextInt();
+                scanner.nextLine();
+                
+                switch (opcion) {
+                    case 1:
+                        System.out.println("\n🔹 Abriendo consola de Cliente...\n");
+                        // Aquí se llamaría a la consola de Cliente
+                        break;
+                    case 2:
+                        System.out.println("\n🔹 Abriendo consola de Empleado...\n");
+                        // Aquí se llamaría a la consola de Empleado
+                        break;
+                    case 3:
+                        System.out.println("\n🔹 Abriendo consola de Administrador...\n");
+                        ConsolaAdministrador consolaAdmin = new ConsolaAdministrador(cafeCargado);
+                        consolaAdmin.ejecutar();
+                        break;
+                    default:
+                        System.out.println("❌ Opción inválida. Intente de nuevo.\n");
+                }
+            } else {
+                System.out.println("❌ Entrada inválida. Ingrese un número.\n");
+                scanner.next();
+                opcion = -1;
+            }
+            
+        } while (List.of(1,2,3).contains(opcion)== false);
+        
+        cafeCargado.save();
+        scanner.close();
+        
+        System.out.println("\nSaliendo...\n\nGracias");
+    }
+	
 }
+	
+	
