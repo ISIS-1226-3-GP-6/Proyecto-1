@@ -18,7 +18,7 @@ public class JuegoDeMesa implements Serializable {
 	
 	private double precio;
 	
-	public JuegoDeMesa(String nombre, int anioPublicacion, String empresaMatriz, String tipoJuego, boolean esDificil, boolean puedenNinos, boolean puedenJovenes, int inJugadores, int maxJugadores, double precio) {
+	public JuegoDeMesa(String nombre, int anioPublicacion, String empresaMatriz, String tipoJuego, boolean esDificil, boolean puedenNinos, boolean puedenJovenes, int minJugadores, int maxJugadores, double precio) {
 		this.nombre = nombre;
 		this.anioPublicacion = anioPublicacion;
 		this.empresaMatriz = empresaMatriz;
@@ -26,6 +26,8 @@ public class JuegoDeMesa implements Serializable {
 		this.esDificil = esDificil;
 		this.puedenNinos = puedenNinos;
 		this.puedenJovenes = puedenJovenes;
+		this.minJugadores = minJugadores;
+		this.maxJugadores = maxJugadores;
 		this.precio = precio;
 	}
 

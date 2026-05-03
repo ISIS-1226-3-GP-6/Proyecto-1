@@ -22,6 +22,8 @@ public class Prestamo implements Serializable {
         this.terminado = false;
         if (usuario == null || (usuario instanceof Cliente && reserva == null))
         	throw new RuntimeException("Creacion de prestamo invalido");
+        this.usuario = usuario;
+        this.reserva = reserva;
     }
 
     public Date getFecha(){

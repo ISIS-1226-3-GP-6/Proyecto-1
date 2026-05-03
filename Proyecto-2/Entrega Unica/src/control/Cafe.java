@@ -18,6 +18,7 @@ import cafeteria.Platillo;
 import cafeteria.TicketNuevoPlatillo;
 import compras.CompraJuegoMesa;
 import compras.CompraPlatillo;
+import compras.Compra;
 import horario.HorarioSemanal;
 import horario.TicketCambiarTurno;
 import horario.Turno;
@@ -51,6 +52,8 @@ public class Cafe implements Serializable {
 	private List<Reserva> reservas; // pending in doc
 	
 	private List<Usuario> usuarios; // Pending in doc
+
+	private List<Compra> compras; // Pending in doc, needed for implementation
 	
 	private Administrador admin; // Pending in doc
 	private String ioPath; // Path for persistence, not in doc but needed for implementation
