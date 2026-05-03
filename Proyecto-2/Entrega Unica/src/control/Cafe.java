@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Scanner;
 
 
@@ -26,6 +27,7 @@ import horario.Turno;
 import juego.JuegoDeMesa;
 import juego.JuegoFisico;
 import juego.Prestamo;
+import juego.Torneo;
 import reservacion.Mesa;
 import reservacion.Reserva;
 import usuarios.Cliente;
@@ -54,6 +56,8 @@ public class Cafe implements Serializable {
 	
 	private List<Usuario> usuarios; // Pending in doc
 	
+	private List<Torneo> torneos;
+	
 	private Administrador admin; // Pending in doc
 	private String ioPath; // Path for persistence, not in doc but needed for implementation
 	
@@ -73,6 +77,7 @@ public class Cafe implements Serializable {
 		this.historialPrestamos = new ArrayList<>();
 		this.usuarios = new ArrayList<>();
 		this.reservas = new ArrayList<>();
+		this.torneos = new ArrayList<>();
 		
 		this.admin = new Administrador(loginAdmin, passwordAdmin);
 	}
@@ -102,6 +107,7 @@ public class Cafe implements Serializable {
 			this.reservas = persistedCafe.reservas;
 			this.admin = persistedCafe.admin;
 			this.ioPath = persistedCafe.ioPath;
+			this.torneos = persistedCafe.torneos == null ? new ArrayList<>() : persistedCafe.torneos;
 		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException("Could not load cafe persistence", e);
 		}
@@ -327,11 +333,92 @@ public class Cafe implements Serializable {
 	public Set<Platillo> getMenu() {
 		return menu;
 	}
+	
+	public List<Usuario> getUsuarios() {
+		return usuarios;
+	}
+
+	public List<Reserva> getReservas() {
+	    return reservas;
+	}
+
+	public List<Torneo> getTorneos() {
+	    return torneos;
+	}
+	
+	public HorarioSemanal getHorario() {
+	    return horario;
+	}
 
 	public List<TicketNuevoPlatillo> getTicketsPlatillosPendientes() {
 		return ticketsPlatillosPendientes;
 	}
-
+	
+	
+	
+	public boolean crearTorneo(String loginAdmin, String passwordAdmin, boolean esCompetitivo, 
+            int bono, double costoEntrada, int cupos, String juegoNombre) {
+		if (!esAdmin(loginAdmin, passwordAdmin)) {
+			return false;	
+		}
+		
+		JuegoDeMesa juego = catalogoJuegos.stream()
+			.filter(j -> j.getNombre().equalsIgnoreCase(juegoNombre))
+			.findFirst()
+			.orElse(null);
+		
+		if (juego == null || bono < 0 || costoEntrada < 0 || cupos <= 0) {
+			return false;
+		}
+		
+		Torneo torneo = new Torneo(esCompetitivo, bono, costoEntrada, cupos, juego);
+			torneos.add(torneo);
+			return true;
+		}
+	
+	public List<Torneo> getTorneosActivos() {
+	    return torneos.stream()
+	            .filter(t -> t.getCuposTaken() < t.getCupos())
+	            .collect(Collectors.toList());
+	}
+	
+	public void mostrarInscripcionesTorneo(Torneo torneo) {
+	    if (torneo == null) {
+	        System.out.println("Torneo no válido.");
+	        return;
+	    }
+	    
+	    torneo.verEstatusInscripcion();
+	}
+	
+	public boolean eliminarTorneo(String loginAdmin, String passwordAdmin, Torneo torneo) {
+	    if (!esAdmin(loginAdmin, passwordAdmin) || torneo == null || !torneos.contains(torneo)) {
+	        return false;
+	    }
+	    
+	    return torneos.remove(torneo);
+	}
+	
+	public boolean asignarGanadorTorneo(String loginAdmin, String passwordAdmin, Torneo torneo, String ganadorLogin) {
+	    if (!esAdmin(loginAdmin, passwordAdmin) || torneo == null || !torneos.contains(torneo)) {
+	        return false;
+	    }
+	    
+	    Usuario ganador = usuarios.stream()
+	            .filter(u -> u.getLogin().equals(ganadorLogin) && u instanceof Cliente)
+	            .findFirst()
+	            .orElse(null);
+	    
+	    if (ganador == null || !torneo.getUsuarios().contains(ganador)) {
+	        return false;
+	    }
+	    
+	    Cliente clienteGanador = (Cliente) ganador;
+	    clienteGanador.agregarPuntos(torneo.getBono());
+	    return true;
+	}
+	
+	
 	private Usuario autenticarUsuario(String login, String password) {
 		return usuarios.stream()
 				.filter(usuario -> usuario.getLogin().equals(login) && usuario.autenticacion(password))
@@ -556,6 +643,21 @@ public class Cafe implements Serializable {
 			System.out.println("Compra juegos total=" + compraJuegos.calcularTotal()
 					+ ", items=" + compraJuegos.getJuegos().size());
 		}
+		
+		List<Torneo> torneos = cafe.getTorneos();
+        List<Torneo> torneosActivos = torneos == null ? new ArrayList<>() : torneos.stream()
+                .filter(t -> t.getCuposTaken() < t.getCupos())
+                .collect(Collectors.toList());
+        
+        System.out.println("Torneos activos: " + torneosActivos.size());
+        for (Torneo t : torneosActivos) {
+            int cuposDisponibles = t.getCupos() - t.getCuposTaken();
+            System.out.println(" - Juego: " + (t.getJuego() != null ? t.getJuego().getNombre() : "Sin juego")
+                    + " | Cupos Disponibles: " + cuposDisponibles + "/" + t.getCupos()
+                    + " | Bono: " + t.getBono() + " puntos"
+                    + " | Competitivo: " + (t.isEsCompetitivo() ? "Si" : "No")
+                    + " | Costo: $" + t.getCostoEntrada());
+        }
 		System.out.println("====================================");
 	}
 	
@@ -665,7 +767,7 @@ public class Cafe implements Serializable {
 		c.save();*/
 		String nombreCafe = "escenario1.txt";
 		Cafe cafeCargado = new Cafe(nombreCafe);
-		/*Cafe.imprimirEstado("CAFE CARGADO DESDE escenario1.txt", cafeCargado, null, null, null, null);*/
+		Cafe.imprimirEstado("CAFE CARGADO DESDE escenario1.txt", cafeCargado, null, null, null, null);
 		
 		
 		Scanner scanner = new Scanner(System.in);
@@ -684,23 +786,25 @@ public class Cafe implements Serializable {
                 
                 switch (opcion) {
                     case 1:
-                        System.out.println("\n🔹 Abriendo consola de Cliente...\n");
-                        // Aquí se llamaría a la consola de Cliente
+                        System.out.println("\n- Abriendo consola de Cliente...\n");
+                        ConsolaCliente consolaCliente = new ConsolaCliente(cafeCargado);
+                        consolaCliente.ejecutar();
                         break;
                     case 2:
-                        System.out.println("\n🔹 Abriendo consola de Empleado...\n");
-                        // Aquí se llamaría a la consola de Empleado
+                        System.out.println("\n- Abriendo consola de Empleado...\n");
+                        ConsolaEmpleado consolaEmpleado = new ConsolaEmpleado(cafeCargado);
+                        consolaEmpleado.ejecutar();
                         break;
                     case 3:
-                        System.out.println("\n🔹 Abriendo consola de Administrador...\n");
+                        System.out.println("\n- Abriendo consola de Administrador...\n");
                         ConsolaAdministrador consolaAdmin = new ConsolaAdministrador(cafeCargado);
                         consolaAdmin.ejecutar();
                         break;
                     default:
-                        System.out.println("❌ Opción inválida. Intente de nuevo.\n");
+                        System.out.println("Opción inválida. Intente de nuevo.\n");
                 }
             } else {
-                System.out.println("❌ Entrada inválida. Ingrese un número.\n");
+                System.out.println("Entrada inválida. Ingrese un número.\n");
                 scanner.next();
                 opcion = -1;
             }

@@ -3,12 +3,15 @@ package control;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import cafeteria.TicketNuevoPlatillo;
 import horario.TicketCambiarTurno;
 import juego.JuegoFisico;
 import juego.Torneo;
+import usuarios.Cocinero;
 import usuarios.Empleado;
+import usuarios.Mesero;
 
 public class ConsolaAdministrador {
 
@@ -209,77 +212,197 @@ public class ConsolaAdministrador {
         }
     }
 
+
     private void marcarDesaparecido() {
-        List<JuegoFisico> juegos = sistema.getCatalogoPrestamo();
-        if (juegos.isEmpty()) {
+        List<JuegoFisico> prestamo = sistema.getCatalogoPrestamo();
+        if (prestamo.isEmpty()) {
             System.out.println("No hay juegos en prestamo.");
             return;
         }
-        for (int i = 0; i < juegos.size(); i++) {
-            System.out.println(i + ". " + juegos.get(i).getJuegoBase().getNombre());
+        for (int i = 0; i < prestamo.size(); i++) {
+            System.out.println(i + ". " + prestamo.get(i).getJuegoBase().getNombre());
         }
         System.out.print("Seleccione indice: ");
-        int index = scanner.nextInt();
+        int idx = scanner.nextInt();
         scanner.nextLine();
-        if (index < 0 || index >= juegos.size()) {
+        if (idx < 0 || idx >= prestamo.size()) {
             System.out.println("Indice invalido.");
             return;
         }
-        sistema.marcarJuegoDesaparecido(loginAdmin, passwordAdmin, juegos.get(index));
+        JuegoFisico juego = prestamo.get(idx);
+        juego.setEstado("desaparecido");
+        sistema.getCatalogoPrestamo().remove(juego);
         System.out.println("Juego marcado como desaparecido.");
     }
-
+  
+    
     private void registrarEmpleado() {
-        System.out.print("Login del nuevo empleado: ");
+        System.out.print("Login: ");
         String login = scanner.nextLine();
-        System.out.print("Contrasena: ");
-        String password = scanner.nextLine();
+        System.out.print("Password: ");
+        String pass = scanner.nextLine();
         System.out.print("Rol (mesero/cocinero): ");
         String rol = scanner.nextLine();
-        boolean ok = sistema.registrarEmpleado(loginAdmin, passwordAdmin, login, password, rol);
-        if (ok) {
-            System.out.println("Empleado registrado.");
-        } else {
-            System.out.println("Error al registrar empleado.");
+
+        boolean existe = sistema.getUsuarios().stream()
+                .anyMatch(u -> u.getLogin().equals(login));
+        
+        if (existe) {
+            System.out.println("Error: el login ya existe.");
+            return;
         }
+
+        Empleado nuevo = null;
+        if (rol.equalsIgnoreCase("mesero")) {
+            nuevo = new Mesero(login, pass);
+        } else if (rol.equalsIgnoreCase("cocinero")) {
+            nuevo = new Cocinero(login, pass);
+        } else {
+            System.out.println("Rol invalido. Use 'mesero' o 'cocinero'.");
+            return;
+        }
+
+        // Agregar a la lista de usuarios del cafe
+        sistema.getUsuarios().add(nuevo);
+        System.out.println("Empleado registrado exitosamente.");
     }
 
+    /*
     private void moverJuegoEntreCatalogos() {
-        List<JuegoFisico> juegos = sistema.getCatalogoCompra();
-        if (juegos.isEmpty()) {
+        List<JuegoFisico> compra = sistema.getCatalogoCompra();
+        if (compra.isEmpty()) {
             System.out.println("No hay juegos en catalogo de compra.");
             return;
         }
-        System.out.println("Juegos en catalogo de compra:");
-        for (int i = 0; i < juegos.size(); i++) {
-            System.out.println(i + ". " + juegos.get(i).getJuegoBase().getNombre());
+        for (int i = 0; i < compra.size(); i++) {
+            System.out.println(i + ". " + compra.get(i).getJuegoBase().getNombre());
         }
         System.out.print("Seleccione indice: ");
-        int index = scanner.nextInt();
+        int idx = scanner.nextInt();
         scanner.nextLine();
-        if (index < 0 || index >= juegos.size()) {
+        if (idx < 0 || idx >= compra.size()) {
             System.out.println("Indice invalido.");
             return;
         }
-        sistema.moverJuegoAPrestamo(loginAdmin, passwordAdmin, juegos.get(index));
+        JuegoFisico juego = compra.get(idx);
+        sistema.getCatalogoCompra().remove(juego);
+        sistema.getCatalogoPrestamo().add(juego);
         System.out.println("Juego movido a catalogo de prestamo.");
+    }
+    */
+    
+    private void moverJuegoEntreCatalogos() {
+        System.out.println("\n--- MOVER JUEGO ENTRE CATALOGOS ---");
+        System.out.println("1. Mover de COMPRA a PRESTAMO");
+        System.out.println("2. Mover de PRESTAMO a COMPRA");
+        System.out.print("Seleccione una opcion: ");
+        
+        int direccion = scanner.nextInt();
+        scanner.nextLine();
+        
+        if (direccion == 1) {
+            List<JuegoFisico> origen = sistema.getCatalogoCompra();
+            if (origen.isEmpty()) {
+                System.out.println("No hay juegos en el catalogo de COMPRA.");
+                return;
+            }
+            
+            System.out.println("\n--- CATALOGO DE COMPRA ---");
+            for (int i = 0; i < origen.size(); i++) {
+                System.out.println(i + ". " + origen.get(i).getJuegoBase().getNombre() 
+                        + " | Estado: " + origen.get(i).getEstado());
+            }
+            
+            System.out.print("\nSeleccione el indice del juego a mover: ");
+            int idx = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (idx < 0 || idx >= origen.size()) {
+                System.out.println("Indice invalido.");
+                return;
+            }
+            
+            JuegoFisico juego = origen.get(idx);
+            sistema.getCatalogoCompra().remove(juego);
+            sistema.getCatalogoPrestamo().add(juego);
+            System.out.println("Juego '" + juego.getJuegoBase().getNombre() + "' movido a catalogo de PRESTAMO.");
+            
+        } else if (direccion == 2) {
+            List<JuegoFisico> origen = sistema.getCatalogoPrestamo();
+            if (origen.isEmpty()) {
+                System.out.println("No hay juegos en el catalogo de PRESTAMO.");
+                return;
+            }
+            
+            System.out.println("\n--- CATALOGO DE PRESTAMO ---");
+            for (int i = 0; i < origen.size(); i++) {
+                System.out.println(i + ". " + origen.get(i).getJuegoBase().getNombre() 
+                        + " | Estado: " + origen.get(i).getEstado()
+                        + " | Ocupado: " + (origen.get(i).isOcupado() ? "SI" : "NO"));
+            }
+            
+            System.out.print("\nSeleccione el indice del juego a mover: ");
+            int idx = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (idx < 0 || idx >= origen.size()) {
+                System.out.println("Indice invalido.");
+                return;
+            }
+            
+            JuegoFisico juego = origen.get(idx);
+            
+            if (juego.isOcupado()) {
+                System.out.println("No se puede mover el juego porque actualmente esta prestado.");
+                return;
+            }
+            
+            sistema.getCatalogoPrestamo().remove(juego);
+            sistema.getCatalogoCompra().add(juego);
+            System.out.println("Juego '" + juego.getJuegoBase().getNombre() + "' movido a catalogo de COMPRA.");
+            
+        } else {
+            System.out.println("Opcion invalida.");
+        }
     }
 
     private void repararJuego() {
-        List<JuegoFisico> danados = sistema.getJuegosDaniados();
+        List<JuegoFisico> prestamo = sistema.getCatalogoPrestamo();
+        List<JuegoFisico> danados = prestamo.stream()
+                .filter(j -> j.getEstado().equals("falta una pieza") || j.getEstado().equals("daniado"))
+                .collect(Collectors.toList());
+
         if (danados.isEmpty()) {
-            System.out.println("No hay juegos danados.");
+            System.out.println("No hay juegos danados en prestamo.");
             return;
         }
         for (int i = 0; i < danados.size(); i++) {
             System.out.println(i + ". " + danados.get(i).getJuegoBase().getNombre());
         }
         System.out.print("Seleccione juego danado: ");
-        int index = scanner.nextInt();
+        int idx = scanner.nextInt();
         scanner.nextLine();
-        sistema.repararJuego(loginAdmin, passwordAdmin, danados.get(index));
+        if (idx < 0 || idx >= danados.size()) {
+            System.out.println("Indice invalido.");
+            return;
+        }
+        JuegoFisico danado = danados.get(idx);
+        List<JuegoFisico> nuevos = sistema.getCatalogoCompra().stream()
+                .filter(j -> j.getJuegoBase().equals(danado.getJuegoBase()) && j.getEstado().equals("nuevo"))
+                .collect(Collectors.toList());
+
+        if (nuevos.isEmpty()) {
+            System.out.println("No hay copias nuevas de este juego en compra para reparar.");
+            return;
+        }
+        JuegoFisico nuevo = nuevos.get(0);
+        sistema.getCatalogoPrestamo().remove(danado);
+        sistema.getCatalogoPrestamo().add(nuevo);
+        sistema.getCatalogoCompra().remove(nuevo);
         System.out.println("Juego reparado.");
     }
+    
+    
 
     private void crearTorneo() {
         System.out.print("Es competitivo? (true/false): ");
