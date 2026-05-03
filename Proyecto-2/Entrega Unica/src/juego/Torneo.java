@@ -21,7 +21,7 @@ public class Torneo implements Serializable {
 	private List<Usuario> usuarios;
 	private JuegoDeMesa juego;
 
-	public Torneo(boolean esCompetitivo, int bono, double costoEntrada, int cupos) {
+	public Torneo(boolean esCompetitivo, int bono, double costoEntrada, int cupos, JuegoDeMesa juego) {
 		this.esCompetitivo = esCompetitivo;
 		this.bono = bono;
 		this.costoEntrada = costoEntrada;
@@ -29,7 +29,9 @@ public class Torneo implements Serializable {
 		this.cuposTaken = 0;
 		this.cuposPrioritariosTaken = 0;
 		this.usuarios = new ArrayList<>();
+		this.juego = juego;
 	}
+
 
 	public boolean desinscribir(Usuario usuario) {
 		if (usuario == null || !usuarios.contains(usuario)) {
@@ -149,7 +151,6 @@ public class Torneo implements Serializable {
 	public List<Usuario> getUsuarios() {
 		return usuarios;
 	}
-
 	public JuegoDeMesa getJuego() {
 		return juego;
 	}
@@ -157,4 +158,5 @@ public class Torneo implements Serializable {
 	public void setJuego(JuegoDeMesa juego) {
 		this.juego = juego;
 	}
+
 }
