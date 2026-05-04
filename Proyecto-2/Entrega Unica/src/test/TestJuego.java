@@ -32,7 +32,7 @@ public class TestJuego {
 	public void setUp() {
 		catan = new JuegoDeMesa("Catan", 1995, "Kosmos", "Estrategia", false, true, true, 3, 4, 120000);
 		juegoFisico = new JuegoFisico("nuevo", false, catan);
-		torneo = new Torneo(true, 100, 25000, 5);
+		torneo = new Torneo(true, 100, 25000, 5, catan);
 		ana = new Cliente("ana", "1234", 0);
 		bruno = new Cliente("bruno", "abcd", 5);
 		mesero = new Mesero("mario", "mesero123");
