@@ -63,6 +63,7 @@ public class Cafe implements Serializable {
 	
 	private Administrador admin; // Pending in doc
 	private String ioPath; // Path for persistence, not in doc but needed for implementation
+	private Usuario usuarioActivo;
 	
 	
 	
@@ -81,8 +82,10 @@ public class Cafe implements Serializable {
 		this.usuarios = new ArrayList<>();
 		this.reservas = new ArrayList<>();
 		this.torneos = new ArrayList<>();
+		this.compras = new ArrayList<>();
 		
 		this.admin = new Administrador(loginAdmin, passwordAdmin);
+		this.usuarioActivo = null;
 	}
 	
 	public Cafe(String ioPath) {
@@ -111,6 +114,8 @@ public class Cafe implements Serializable {
 			this.admin = persistedCafe.admin;
 			this.ioPath = persistedCafe.ioPath;
 			this.torneos = persistedCafe.torneos == null ? new ArrayList<>() : persistedCafe.torneos;
+			this.compras = persistedCafe.compras == null ? new ArrayList<>() : persistedCafe.compras;
+			this.usuarioActivo = null;
 		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException("Could not load cafe persistence", e);
 		}
@@ -140,6 +145,42 @@ public class Cafe implements Serializable {
 		}
 
 		return false;
+	}
+
+	public boolean crearMesero(String loginAdmin, String passwordAdmin, String login, String password) {
+		if (!esAdmin(loginAdmin, passwordAdmin) || login == null || password == null
+				|| usuarios.stream().anyMatch(u -> u.getLogin().equals(login))) {
+			return false;
+		}
+
+		return usuarios.add(new Mesero(login, password));
+	}
+
+	public boolean crearCocinero(String loginAdmin, String passwordAdmin, String login, String password) {
+		if (!esAdmin(loginAdmin, passwordAdmin) || login == null || password == null
+				|| usuarios.stream().anyMatch(u -> u.getLogin().equals(login))) {
+			return false;
+		}
+
+		return usuarios.add(new Cocinero(login, password));
+	}
+
+	public boolean iniciarSesion(String login, String password) {
+		Usuario usuario = autenticarUsuario(login, password);
+		if (usuario == null) {
+			return false;
+		}
+
+		usuarioActivo = usuario;
+		return true;
+	}
+
+	public void cerrarSesion() {
+		usuarioActivo = null;
+	}
+
+	public Usuario getUsuarioActivo() {
+		return usuarioActivo;
 	}
 
 	public boolean crearReservacion(String login, String password, int numPersonas, boolean hayMenores, boolean hayNinos) {
@@ -345,6 +386,14 @@ public class Cafe implements Serializable {
 	    return reservas;
 	}
 
+	public List<Mesa> getMesas() {
+		return mesas;
+	}
+
+	public List<Compra> getCompras() {
+		return compras;
+	}
+
 	public List<Torneo> getTorneos() {
 	    return torneos;
 	}
@@ -429,6 +478,38 @@ public class Cafe implements Serializable {
 				.orElse(null);
 	}
 
+	public List<Turno> consultarTurnosEmpleado(String login, String password) {
+		Empleado empleado = autenticarEmpleado(login, password);
+		if (empleado == null) {
+			return new ArrayList<>();
+		}
+
+		return horario.getTurnosPorDia().values().stream()
+				.filter(turno -> turno.getEmpleados().contains(empleado))
+				.collect(Collectors.toList());
+	}
+
+	public boolean registrarAyudaMesero(String loginMesero, String passwordMesero, JuegoDeMesa juego) {
+		Empleado empleado = autenticarEmpleado(loginMesero, passwordMesero);
+		if (!(empleado instanceof Mesero) || juego == null) {
+			return false;
+		}
+
+		return ((Mesero) empleado).puedeExplicar(juego);
+	}
+
+	public List<JuegoFisico> consultarJuegosPrestamoCompatibles(Reserva reserva) {
+		if (reserva == null || !reservas.contains(reserva)) {
+			return new ArrayList<>();
+		}
+
+		return inventarioPrestamo.stream()
+				.filter(juego -> juego != null && juego.estaDisponible() && juego.getJuegoBase() != null)
+				.filter(juego -> juego.getJuegoBase().aptoParaNumJugadores(reserva.getNumPersonas()))
+				.filter(juego -> juego.getJuegoBase().esAptoParaEdad(reserva.isHayNinos(), reserva.isHayMenores()))
+				.collect(Collectors.toList());
+	}
+
 	public CompraJuegoMesa generarCompraJuegos(String login, String password, List<JuegoFisico> juegos, double descuento) {
 		Usuario usuario = autenticarUsuario(login, password);
 		if (usuario == null || juegos == null || juegos.isEmpty() || descuento < 0) {
@@ -454,6 +535,7 @@ public class Cafe implements Serializable {
 			((Cliente) usuario).agregarPuntos(total);
 		}
 
+		compras.add(compra);
 		return compra;
 	}
 
@@ -492,6 +574,7 @@ public class Cafe implements Serializable {
 			((Cliente) usuario).agregarPuntos(total);
 		}
 
+		compras.add(compra);
 		return compra;
 	}
 
@@ -504,6 +587,11 @@ public class Cafe implements Serializable {
 			return null;
 		}
 		if (reserva != null && !reservas.contains(reserva)) {
+			return null;
+		}
+		if (reserva != null && juego.getJuegoBase() != null
+				&& (!juego.getJuegoBase().aptoParaNumJugadores(reserva.getNumPersonas())
+						|| !juego.getJuegoBase().esAptoParaEdad(reserva.isHayNinos(), reserva.isHayMenores()))) {
 			return null;
 		}
 
