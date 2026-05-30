@@ -577,7 +577,7 @@ public class Cafe implements Serializable {
 		compras.add(compra);
 		return compra;
 	}
-
+	/*
 	public Prestamo generarPrestamoJuego(String login, String password, JuegoFisico juego, Reserva reserva) {
 		Usuario usuario = autenticarUsuario(login, password);
 		if (usuario == null || juego == null || !inventarioPrestamo.contains(juego) || juego.isOcupado()) {
@@ -606,6 +606,66 @@ public class Cafe implements Serializable {
 		}
 
 		return prestamo;
+	}*/
+	
+	public Prestamo generarPrestamoJuego(String login, String password, JuegoFisico juego, Reserva reserva) {
+	    Usuario usuario = autenticarUsuario(login, password);
+	    
+	    // Verificar cada condición y mostrar por qué falla
+	    if (usuario == null) {
+	        System.out.println("ERROR PRESTAMO: Usuario no autenticado: " + login);
+	        return null;
+	    }
+	    if (juego == null) {
+	        System.out.println("ERROR PRESTAMO: Juego es null");
+	        return null;
+	    }
+	    if (!inventarioPrestamo.contains(juego)) {
+	        System.out.println("ERROR PRESTAMO: Juego no está en inventarioPrestamo: " + juego.getJuegoBase().getNombre());
+	        System.out.println("   Inventario prestamo contiene: " + inventarioPrestamo.size() + " juegos");
+	        return null;
+	    }
+	    if (juego.isOcupado()) {
+	        System.out.println("ERROR PRESTAMO: Juego ya está ocupado: " + juego.getJuegoBase().getNombre());
+	        return null;
+	    }
+	    if (usuario instanceof Cliente && reserva == null) {
+	        System.out.println("ERROR PRESTAMO: Cliente sin reserva: " + usuario.getLogin());
+	        return null;
+	    }
+	    if (reserva != null && !reservas.contains(reserva)) {
+	        System.out.println("ERROR PRESTAMO: Reserva no válida para este café");
+	        return null;
+	    }
+	    
+	    // Verificar compatibilidad del juego con la reserva
+	    if (reserva != null && juego.getJuegoBase() != null) {
+	        boolean aptoNum = juego.getJuegoBase().aptoParaNumJugadores(reserva.getNumPersonas());
+	        boolean aptoEdad = juego.getJuegoBase().esAptoParaEdad(reserva.isHayNinos(), reserva.isHayMenores());
+	        
+	        if (!aptoNum) {
+	            System.out.println("ERROR PRESTAMO: Juego no apto para " + reserva.getNumPersonas() + " personas");
+	            return null;
+	        }
+	        if (!aptoEdad) {
+	            System.out.println("ERROR PRESTAMO: Juego no apto para niños/menores");
+	            return null;
+	        }
+	    }
+
+	    Prestamo prestamo = new Prestamo(new Date(), juego, usuario, reserva);
+	    juego.prestar();
+	    historialPrestamos.add(prestamo);
+
+	    if (reserva != null && !reserva.agregarPrestamo(prestamo)) {
+	        System.out.println("ERROR PRESTAMO: No se pudo agregar préstamo a la reserva (límite alcanzado?)");
+	        prestamo.finalizar();
+	        historialPrestamos.remove(prestamo);
+	        return null;
+	    }
+
+	    System.out.println("PRÉSTAMO EXITOSO: " + juego.getJuegoBase().getNombre() + " para " + usuario.getLogin());
+	    return prestamo;
 	}
 
 	public TicketCambiarTurno solicitarCambioTurno(String loginEmpleadoPrincipal, String passwordEmpleadoPrincipal,
