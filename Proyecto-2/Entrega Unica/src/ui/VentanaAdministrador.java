@@ -16,6 +16,7 @@ import ui.panels.PanelAdministradorTickets;
 import ui.panels.PanelAdministradorTorneos;
 import ui.panels.PanelAdministradorCatalogo;
 import ui.panels.PanelAdministradorEmpleados;
+import ui.panels.PanelAdministradorGraficas;
 
 public class VentanaAdministrador extends JFrame {
     /**
@@ -32,6 +33,7 @@ public class VentanaAdministrador extends JFrame {
     private PanelAdministradorJuegos panelJuegos;
     private PanelAdministradorInventario panelInventario;
     private PanelAdministradorTickets panelTickets;
+    private PanelAdministradorGraficas panelGraficas;
     private JPanel panelTorneos;
     private JPanel panelEmpleados;
     
@@ -88,6 +90,7 @@ public class VentanaAdministrador extends JFrame {
         panelTickets = new PanelAdministradorTickets(cafe);          // Aprobar/rechazar tickets
         panelTorneos = new PanelAdministradorTorneos(cafe);          // Crear, asignar, eliminar torneos
         panelEmpleados = new PanelAdministradorEmpleados(cafe);      // Registrar empleado
+        panelGraficas = new PanelAdministradorGraficas(cafe);
         
         panelContenido.add(panelCatalogo, "catalogo");
         panelContenido.add(panelJuegos, "juegos");
@@ -95,6 +98,7 @@ public class VentanaAdministrador extends JFrame {
         panelContenido.add(panelTickets, "tickets");
         panelContenido.add(panelTorneos, "torneos");
         panelContenido.add(panelEmpleados, "empleados");
+        panelContenido.add(panelGraficas, "graficas");
         
         add(panelContenido, BorderLayout.CENTER);
         
@@ -113,7 +117,8 @@ public class VentanaAdministrador extends JFrame {
             {"Gestionar Inventario", "inventario"},
             {"Resolver Tickets", "tickets"},
             {"Gestionar Torneos", "torneos"},
-            {"Gestionar Empleados", "empleados"}
+            {"Gestionar Empleados", "empleados"},
+            {"Ver Graficas", "graficas"}
         };
         
         for (String[] opcion : opciones) {
