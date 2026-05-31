@@ -1,5 +1,6 @@
 package reservacion;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class Reserva implements Serializable {
     private int mesaId;
     private Set<Prestamo> prestamosActivos;
     private Cliente cliente;
+    private LocalDateTime fechaHora;
     
     public Reserva(int numPersonas, boolean hayMenores, boolean hayNinos, int mesaId, Cliente cliente) {
         this.numPersonas = numPersonas;
@@ -26,6 +28,7 @@ public class Reserva implements Serializable {
         this.terminada = false;
         this.prestamosActivos = new HashSet<>();
         this.cliente = cliente;
+        this.fechaHora = LocalDateTime.now();
     }
     
     public int getNumPersonas(){
@@ -85,6 +88,14 @@ public class Reserva implements Serializable {
     
     public Cliente getCliente() {
     	return cliente;
+    }
+
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public void setFechaHora(LocalDateTime fechaHora) {
+        this.fechaHora = fechaHora;
     }
 	
 }
